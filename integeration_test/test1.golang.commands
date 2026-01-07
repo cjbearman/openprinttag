@@ -1,0 +1,2 @@
+./optag -init 304 -data test1.yaml -test-mode > test1.golang.bin
+

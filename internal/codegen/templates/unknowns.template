@@ -1,0 +1,8 @@
+// GetUnknownFields returns a map of all unknown fields
+// For the aux region, this will also include all vendor specific fields
+func (s *#TYPE#) GetUnknownFields() map[any]any {
+	if s.internal.Unknowns == nil {
+		s.internal.Unknowns = make(map[any]any)
+	}
+	return s.internal.Unknowns
+}

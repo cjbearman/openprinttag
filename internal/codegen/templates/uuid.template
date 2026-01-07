@@ -1,0 +1,19 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value uuid.UUID) *#TYPE#{
+    s.internal.#FIELD# = &value
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() (uuid.UUID, bool) {
+    if s.internal.#FIELD# != nil {
+        return *s.internal.#FIELD#, true
+    }
+    return uuid.UUID{}, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}

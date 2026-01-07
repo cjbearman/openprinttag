@@ -1,0 +1,4 @@
+#!/bin/bash
+
+python nfc_initialize.py -s 304 --aux-region=32 --ndef-uri=https://3dtag.org/c/4ea3c75dc9 | \
+    python rec_update.py /shared/test2.yaml > /shared/test2.python.bin 

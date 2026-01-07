@@ -1,0 +1,28 @@
+// GetVendorSpecificFieldKey will return any value found in the tag
+// with the specified key
+// The value is returned as an any type and must be cast (with checking)
+// for use.
+// Returns nil if no such key exists
+func (s *#TYPE#) GetVendorSpecificField(key uint32) any {
+	if s.internal.Unknowns == nil {
+		return nil
+	}
+	for k, v := range s.internal.Unknowns {
+		if k == uint64(key) {
+			return v
+		}
+	}
+	return nil
+}
+
+// SetVendorSpecificField sets a vendor specific field
+// The value must be encodable in the cbor payload per specification
+// however this is not enforced, which could cause to encoding failure
+// if proper type (string, []byte, int, float) is not used
+func (s *#TYPE#) SetVendorSpecificField(key uint32, value any) *#TYPE# {
+	if s.internal.Unknowns == nil {
+		s.internal.Unknowns = make(map[any]any)
+	}
+	s.internal.Unknowns[uint64(key)] = value
+	return s
+}

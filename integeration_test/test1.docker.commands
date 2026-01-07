@@ -1,0 +1,4 @@
+#!/bin/bash
+
+python nfc_initialize.py -s 304 | \
+    python rec_update.py /shared/test1.yaml > /shared/test1.python.bin 

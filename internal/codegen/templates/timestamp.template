@@ -1,0 +1,20 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value time.Time) *#TYPE# {
+    ival := uint64(value.Unix())
+	s.internal.#FIELD# = &ival
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() (time.Time, bool) {
+    if s.internal.#FIELD# != nil {
+        return time.Unix(int64(*s.internal.#FIELD#), 0), true
+    }
+    return time.Time{}, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}

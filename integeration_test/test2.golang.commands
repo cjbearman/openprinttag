@@ -1,0 +1,2 @@
+./optag -init 304 -aux-size 32 -set-uri https://3dtag.org/c/4ea3c75dc9 -data test2.yaml -test-mode > test2.golang.bin
+

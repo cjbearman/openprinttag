@@ -1,0 +1,20 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value ColorRGBA) *#TYPE# {
+    copy :=ColorRGBA(bytes.Clone(value))
+    s.internal.#FIELD# = &copy
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() (ColorRGBA, bool) {
+    if s.internal.#FIELD# != nil {
+        return *s.internal.#FIELD#, true
+    }
+    return ColorRGBA{0, 0, 0}, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}

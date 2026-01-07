@@ -1,0 +1,19 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value int) *#TYPE#{
+    s.internal.#FIELD# = &value
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() (int, bool) {
+    if s.internal.#FIELD# != nil {
+        return *s.internal.#FIELD#, true
+    }
+    return 0, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}

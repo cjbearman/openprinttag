@@ -1,0 +1,23 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value []#ENUMTYPE#) *#TYPE# {
+    s.internal.#FIELD# = &value
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() ([]#ENUMTYPE#, bool) {
+    if s.internal.#FIELD# != nil {
+        value := make([]#ENUMTYPE#, len(*s.internal.#FIELD#))
+        for idx, item := range *s.internal.#FIELD# {
+            value[idx] = #ENUMTYPE#(item)
+        }
+        return value, true
+    }
+    return []#ENUMTYPE#{}, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}

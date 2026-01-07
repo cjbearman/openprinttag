@@ -1,0 +1,22 @@
+func (e #ENUMTYPE#) MarshalYAML() (any, error) {
+	if str, ok := #MAP#[uint64(e)]; ok {
+		return str, nil
+	}
+	return nil, fmt.Errorf("unknown enumeration: %d", e)
+}
+
+func (e *#ENUMTYPE#) UnmarshalYAML(value *yaml.Node) error {
+	var str string
+	if err := value.Decode(&str); err != nil {
+		return err
+	}
+
+	// Hardly efficient, but this is not critical here
+	for key, name := range #MAP# {
+		if name == str {
+			*e = #ENUMTYPE#(key)
+			return nil
+		}
+	}
+	return fmt.Errorf("unknown enumeration: %s", str)
+}
