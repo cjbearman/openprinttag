@@ -84,7 +84,7 @@ func decode(tagData []byte, opts ...EncodeDecodeOption) (*OpenPrintTag, error) {
 		// Either gone out of range or hit a terminator TLV
 		tag := baseTLV[0]
 		if (err != nil || n != 2) || tag == 0xFE {
-			return nil, errors.New("Did not find NDEF TLV")
+			return nil, errors.New("did not find NDEF TLV")
 		}
 
 		TLVLen := int64(baseTLV[1])
@@ -147,6 +147,7 @@ func decode(tagData []byte, opts ...EncodeDecodeOption) (*OpenPrintTag, error) {
 
 	// Get the raw byte content from the OPT record, this is the data containing the CBOR regions
 	optDataPayload, err := optRecord.Payload()
+	assertTrue(err == nil, "failed to get payload from open print tag record")
 	odp, ok := optDataPayload.(*media.Payload)
 	assertTrue(ok, "incorrect media payload type")
 	optPayload := odp.Payload
@@ -175,7 +176,7 @@ func decode(tagData []byte, opts ...EncodeDecodeOption) (*OpenPrintTag, error) {
 
 	// Load main region
 	main := mainInternal{}
-	rest, err = cbor.UnmarshalFirst(optPayload[mainRegionOffset:], &main)
+	_, err = cbor.UnmarshalFirst(optPayload[mainRegionOffset:], &main)
 	assertTrue(err == nil, "invalid main region")
 	opt.main = &MainRegion{internal: main}
 
@@ -185,7 +186,7 @@ func decode(tagData []byte, opts ...EncodeDecodeOption) (*OpenPrintTag, error) {
 	// load it if we have the offset
 	if auxRegionOffset != 0 {
 		aux := auxInternal{}
-		rest, err = cbor.UnmarshalFirst(optPayload[auxRegionOffset:], &aux)
+		_, err = cbor.UnmarshalFirst(optPayload[auxRegionOffset:], &aux)
 		assertTrue(err == nil, "failed to read aux region")
 		// Got an aux region
 		opt.aux = &AuxRegion{internal: aux}

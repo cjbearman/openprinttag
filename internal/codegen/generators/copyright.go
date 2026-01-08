@@ -41,7 +41,7 @@ func writeCopyright(w io.Writer) {
 	if err != nil {
 		panic("failed to read license file from " + lic)
 	}
-	defer fp.Close()
+	defer func() { _ = fp.Close() }()
 
 	scan := bufio.NewScanner(fp)
 	for scan.Scan() {

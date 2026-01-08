@@ -88,33 +88,51 @@ func encodeAsIndefiniteMap(r Region) ([]byte, error) {
 
 	theMap := mapRegion(&internal)
 
-	enc.StartIndefiniteMap()
+	if err = enc.StartIndefiniteMap(); err != nil {
+		return nil, err
+	}
 	for _, info := range getSortedFieldsToEncode(theMap) {
-		enc.Encode(info.key)
+		if err = enc.Encode(info.key); err != nil {
+			return nil, err
+		}
+		// Now encode the value depending on its type
 		kind := info.field.Elem().Type().Kind()
 		switch kind {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			enc.Encode(info.field.Elem().Interface())
+			if err = enc.Encode(info.field.Elem().Interface()); err != nil {
+				return nil, err
+			}
 		case reflect.Float32, reflect.Float64:
-			enc.Encode(compressFloat(info.field.Elem().Interface(), r.RegionOptions()))
+			if err = enc.Encode(compressFloat(info.field.Elem().Interface(), r.RegionOptions())); err != nil {
+				return nil, err
+			}
 		case reflect.String:
-			enc.Encode(info.field.Elem().Interface())
+			if err = enc.Encode(info.field.Elem().Interface()); err != nil {
+				return nil, err
+			}
 		case reflect.Slice, reflect.Array:
 			kind := info.field.Elem().Type().Elem().Kind()
 			if kind == reflect.Uint8 {
 				// This is a []byte and must be encoded as a byte string
-				enc.Encode(info.field.Elem().Interface())
+				if err = enc.Encode(info.field.Elem().Interface()); err != nil {
+					return nil, err
+				}
 			} else {
 				// This is a []..something else and must be encoded as an indefinite array
-				enc.StartIndefiniteArray()
+				if err = enc.StartIndefiniteArray(); err != nil {
+					return nil, err
+				}
 				for n := 0; n < info.field.Elem().Len(); n++ {
 					sliceContent := info.field.Elem().Index(n).Interface()
-					enc.Encode(sliceContent)
+					if err = enc.Encode(sliceContent); err != nil {
+						return nil, err
+					}
 				}
-				enc.EndIndefinite()
+				if err = enc.EndIndefinite(); err != nil {
+					return nil, err
+				}
 			}
-
 		default:
 			return nil, fmt.Errorf("cannot encode %s", kind)
 		}
@@ -122,11 +140,17 @@ func encodeAsIndefiniteMap(r Region) ([]byte, error) {
 
 	// Add any unknowns back in
 	for key, value := range r.GetUnknownFields() {
-		enc.Encode(key)
-		enc.Encode(value)
+		if err = enc.Encode(key); err != nil {
+			return nil, err
+		}
+		if err = enc.Encode(value); err != nil {
+			return nil, err
+		}
 	}
 
-	enc.EndIndefinite()
+	if err = enc.EndIndefinite(); err != nil {
+		return nil, err
+	}
 
 	return buf.Bytes(), nil
 }
@@ -160,7 +184,10 @@ func encodeAsDefiniteMap(r Region) ([]byte, error) {
 		mapToEncode[key] = value
 	}
 
-	err = enc.Encode(mapToEncode)
+	if err = enc.Encode(mapToEncode); err != nil {
+		return nil, err
+	}
+
 	return buf.Bytes(), nil
 }
 

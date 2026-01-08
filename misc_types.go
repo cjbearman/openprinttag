@@ -157,7 +157,7 @@ func NewColor(str string) (ColorRGBA, error) {
 	str = strings.TrimPrefix(str, "#")
 
 	if !colorRBGValidationRegex.MatchString(str) {
-		return ColorRGBA{}, fmt.Errorf("invalid color_rgba representation: %s. (should be #rrggbb(aa)).", str)
+		return ColorRGBA{}, fmt.Errorf("invalid color_rgba representation  (should be #rrggbb(aa)): %s", str)
 	}
 
 	// Can ignore error, regex already guarantess correctness

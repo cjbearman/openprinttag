@@ -182,13 +182,13 @@ func main() {
 		includeIf(all, openprinttag.IncludeAll)
 		yamlData, err := tag.ToYAML(options...)
 		if err != nil {
-			terminal(fmt.Errorf("failed to format tag as YAML: %w\n", err))
+			terminal(fmt.Errorf("failed to format tag as YAML: %w", err))
 		}
 		writeOutput(out, []byte(yamlData))
 	} else {
 		bintag, err := tag.Encode(ecOpts...)
 		if err != nil {
-			terminal(fmt.Errorf("failed to encode tag: %w\n", err))
+			terminal(fmt.Errorf("failed to encode tag: %w", err))
 		}
 		writeOutput(out, bintag)
 	}
@@ -227,14 +227,14 @@ func loadRecords(filename string) *openprinttag.OpenPrintTag {
 
 func writeOutput(filename string, output []byte) []byte {
 
-	var finalized []byte = output
+	finalized := output
 	if hexForm {
 		finalized = []byte(hex.EncodeToString(output) + "\n")
 	} else if hexDump {
 		buf := &bytes.Buffer{}
 		writer := hex.Dumper(buf)
 		_, err := writer.Write(output)
-		writer.Close()
+		_ = writer.Close()
 		if err != nil {
 			terminal(fmt.Errorf("failed to hex dump output: %w", err))
 		}

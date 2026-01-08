@@ -52,7 +52,6 @@ func main() {
 		panic(fmt.Sprintf("Failed to read package dir (%s): %v", pkgDir, err))
 	}
 	for _, entry := range entries {
-		fmt.Sprintf("File: %s", entry.Name())
 		if !entry.Type().IsRegular() {
 			continue
 		}
