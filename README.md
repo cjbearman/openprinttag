@@ -126,7 +126,7 @@ func MaterialPackageInstanceUUID(NFCTagUid []byte) (uuid.UUID, error)
 ```
 
 ## Command line tool
-The optional "optag" binary is provided as an example, as well as a useful tool for creating and modifying tags.
+The optional "optag" binary is provided as an example, as well as a useful tool for creating and modifying tags. Additionally, "tagtool" is provided for reading/writing a variety of ISO15693 tags (details below).
 
 ### Installation:
 ```
@@ -249,6 +249,24 @@ data:
     aux: {}
 ```
 N.B. Omitting the -yaml option would have output the binary form of the tag
+
+### Writing an actual tag
+You can use the tagtool command included in thie distribution to write tags using an ACS ACR-1552-U USB reader/writer.  Tag types supported are Icode SLIX/SLIX2, ST25DV04, ST25DV16, ST25DV64.
+
+See https://github.com/cjbearman/openprinttag/cmd/tagtool/README.md for more information.
+
+Example, using an Icode Slix2 tag (316 bytes memory, 312 used)
+```
+optag -init 312 -aux-size 32 -data some_fields.yaml | tagtool -w -
+```
+
+### Reading back the tag
+Example of reading the slix2 tag created in the above example:
+
+```
+tagtool -r - | optag -load - -yaml -all
+.. fields are display in YAML
+```
 
 ### Notes
 The opttag utility can also be used with pipes. We could, for example, pipe in an existing tag, add some fields and output the resulting tag.
