@@ -253,7 +253,7 @@ N.B. Omitting the -yaml option would have output the binary form of the tag
 ### Writing an actual tag
 You can use the tagtool command included in thie distribution to write tags using an ACS ACR-1552-U USB reader/writer.  Tag types supported are Icode SLIX/SLIX2, ST25DV04, ST25DV16, ST25DV64.
 
-See https://github.com/cjbearman/openprinttag/cmd/tagtool/README.md for more information.
+See [https://github.com/cjbearman/openprinttag/cmd/tagtool/README.md](https://github.com/cjbearman/openprinttag/blob/main/cmd/tagtool/README.md) for more information.
 
 Example, using an Icode Slix2 tag (316 bytes memory, 312 used)
 ```
