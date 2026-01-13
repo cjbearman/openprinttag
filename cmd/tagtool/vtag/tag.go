@@ -1,7 +1,27 @@
+// MIT License
+//
+// # Copyright (c) 2026 Christopher J Bearman
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 package vtag
 
 import (
-	_ "embed"
 	"encoding/hex"
 )
 
@@ -9,12 +29,13 @@ import (
 type TagType uint8
 
 const (
-	UNKNOWN TagType = iota
+	UNKNOWN   TagType = iota
+	ICODE_SLI         // N.B. untested
 	ICODE_SLIX
 	ICODE_SLIX2
-	ST25DV04
+	ST25DV04 // N.B. untested
 	ST25DV16
-	ST25DV64
+	ST25DV64 // N.B. untested
 )
 
 // TagType returns a string representation of the TagType
@@ -22,6 +43,8 @@ func (t TagType) String() string {
 	switch t {
 	case UNKNOWN:
 		return "UNKNOWN"
+	case ICODE_SLI:
+		return "ICODE SLI"
 	case ICODE_SLIX:
 		return "ICODE SLIX"
 	case ICODE_SLIX2:
@@ -61,6 +84,8 @@ func (t *Tag) GetUIDHex() string {
 // NBlocks returns the number of blocks supported by the tag
 func (t *Tag) NBlocks() uint16 {
 	switch t.ttype {
+	case ICODE_SLI:
+		return 32
 	case ICODE_SLIX:
 		return 28
 	case ICODE_SLIX2:
@@ -77,9 +102,9 @@ func (t *Tag) NBlocks() uint16 {
 }
 
 // BlockSize returns the number of bytes per block supported by the tag
-func (t *Tag) BlockSize() uint8 {
+func (t *Tag) BlockSize() int {
 	switch t.ttype {
-	case ICODE_SLIX, ICODE_SLIX2, ST25DV04, ST25DV16, ST25DV64:
+	case ICODE_SLI, ICODE_SLIX, ICODE_SLIX2, ST25DV04, ST25DV16, ST25DV64:
 		return 4
 	default:
 		return 0

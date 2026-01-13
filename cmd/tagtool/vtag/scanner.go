@@ -1,3 +1,24 @@
+// MIT License
+//
+// # Copyright (c) 2026 Christopher J Bearman
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 package vtag
 
 import (
@@ -120,10 +141,8 @@ func (s *Scanner) OnCard(do OnCardFunc) error {
 	}
 	debug("tag found on reader %s", reader)
 
-	driver := &acr1552{reader}
-	if driver == nil {
-		return errors.New("no scanner driver found")
-	}
+	commonDriver := &commonDriver{}
+	var driver driver
 
 	// Establish a context with the reader
 	debug("Connecting to reader %s", reader)
@@ -136,11 +155,11 @@ func (s *Scanner) OnCard(do OnCardFunc) error {
 	// We do all our communications in a transparent session
 	// start it now and defer the ending of the session
 	debug("start-transparent")
-	driver.start_transparent(card)
-	defer driver.end_transparent(card)
+	commonDriver.start_transparent(card)
+	defer commonDriver.end_transparent(card)
 
 	// Set the appropriate protocol for the session
-	driver.set_protocol_iso15693_3(card)
+	commonDriver.set_protocol_iso15693_3(card)
 
 	// Grab the card status, and harvest the ATR
 	status, err := card.Status()
@@ -150,20 +169,82 @@ func (s *Scanner) OnCard(do OnCardFunc) error {
 	atr := hex.EncodeToString(status.Atr)
 	debug("ATR: %s\n", atr)
 
+	// Now we have to ID the card
+	uid, err := commonDriver.getUID(card)
+	if err != nil {
+		return fmt.Errorf("get uid: %w", err)
+	}
+
+	var tag *Tag
+	if uid[0] == 0xe0 && uid[1] == 0x04 && uid[2] == 0x01 {
+		// First three bytes E0 04 01, then this is NXP ICODE
+		driver = &icode{commonDriver: *commonDriver}
+		driver.(*icode).commonDriver.driver = driver
+		// Bits 37, 36 identify the tag type 00 (SLI), 10 (2/SLIX), 10 (1/SLIX2)
+		// This are the following bits of the fourth byte:
+		subtype := ((uid[3] & 0x18) >> 3)
+		switch subtype {
+		case 0x00:
+			tag = &Tag{
+				ttype: ICODE_SLI,
+				uid:   uid,
+			}
+		case 0x01:
+			tag = &Tag{
+				ttype: ICODE_SLIX2,
+				uid:   uid,
+			}
+		case 0x02:
+			tag = &Tag{
+				ttype: ICODE_SLIX,
+				uid:   uid,
+			}
+		default:
+			return errors.New("unsupported ICODE tag type")
+		}
+		driver.(*icode).tag = tag
+
+	} else if uid[0] == 0xe0 && uid[1] == 0x02 && (uid[2] >= 0x24 && uid[2] <= 0x27) {
+		// ST25DV...
+		driver = &st25dvxx{commonDriver: *commonDriver}
+		driver.(*st25dvxx).commonDriver.driver = driver
+
+		// Use extended system get info to get nblocks
+		_, nblocks, err := driver.getCardInformation(card)
+		if err != nil {
+			return fmt.Errorf("failed extended system get info on ST25DVxx: %v", err)
+		}
+		switch nblocks {
+		case 128:
+			tag = &Tag{
+				ttype: ST25DV04,
+				uid:   uid,
+			}
+
+		case 512:
+			tag = &Tag{
+				ttype: ST25DV16,
+				uid:   uid,
+			}
+		case 2048:
+			tag = &Tag{
+				ttype: ST25DV64,
+				uid:   uid,
+			}
+		default:
+			return errors.New("unsupported ST25DVxx tag type")
+		}
+		driver.(*st25dvxx).tag = tag
+	}
+
 	// Now we can fire up a session
 	session := &Session{
 		atr:    atr,
-		driver: driver,
 		card:   card,
 		status: status,
+		driver: driver,
+		tag:    tag,
 	}
-
-	// Try and ID the tag
-	tag, err := driver.cardID(card)
-	if err != nil {
-		return fmt.Errorf("failed to find an acceptable card: %v", err)
-	}
-	session.tag = tag
 
 	// and process the callback
 	return do(session)

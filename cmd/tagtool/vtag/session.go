@@ -1,16 +1,34 @@
+// MIT License
+//
+// # Copyright (c) 2026 Christopher J Bearman
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 package vtag
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/ebfe/scard"
 )
 
 // A Session represents a communications session to a card applied to the reader
 type Session struct {
 	atr    string
-	driver *acr1552
+	driver driver
 	card   *scard.Card
 	status *scard.CardStatus
 	uid    string
@@ -27,64 +45,15 @@ func (s *Session) GetTag() *Tag {
 	return s.tag
 }
 
-// ReadSingleBlock reads a single block
-func (s *Session) ReadSingleBlock(block uint16) ([]byte, error) {
-	return s.driver.readSingleBlock(s.card, int(s.GetTag().BlockSize()), block)
-}
-
-// WriteSingleBlock writes a single block
-func (s *Session) WriteSingleBlock(block uint16, data []byte) error {
-	return s.driver.writeSingleBlock(s.card, int(s.GetTag().BlockSize()), block, data)
-}
-
 // Write will write the provided data at the specified byte address
+// start must be block aligned
+// If data is not multiple of block size, it will be padded to block size with 0x00 bytes
 func (s *Session) Write(start int, data []byte) error {
-	bs := int(s.GetTag().BlockSize())
-	if start%bs != 0 {
-		return fmt.Errorf("start address must be a multiple of %d", bs)
-	}
-
-	// Pad data to exact block sizes
-	for len(data)%bs != 0 {
-		data = append(data, 0x00)
-	}
-
-	if start+len(data) > s.tag.GetAvailableBytes() {
-		return errors.New("data exceeds tag user memory space")
-	}
-
-	nextBlock := uint16(start / bs)
-
-	for i := 0; i < len(data); i += bs {
-		err := s.WriteSingleBlock(nextBlock, data[i:i+bs])
-		if err != nil {
-			return fmt.Errorf("at block %d: %v", nextBlock, err)
-		}
-		nextBlock++
-	}
-	return nil
+	return s.driver.write(s.card, uint16(start), data)
 }
 
 // Read reads length bytes from the specified start address byte
+// No block alignment is required for reads
 func (s *Session) Read(start int, length int) ([]byte, error) {
-	bs := int(s.GetTag().BlockSize())
-
-	data := make([]byte, 0)
-
-	if start%bs != 0 {
-		return nil, fmt.Errorf("start address must be a multiple of %d", bs)
-	}
-	if start+length > s.tag.GetAvailableBytes() {
-		return nil, errors.New("data exceeds tag user memory space")
-	}
-	nextBlock := uint16(start / bs)
-	for len(data) < length {
-		blockData, err := s.ReadSingleBlock(nextBlock)
-		if err != nil {
-			return nil, fmt.Errorf("at block %d: %v", nextBlock, err)
-		}
-		data = append(data, blockData...)
-		nextBlock++
-	}
-	return data, nil
+	return s.driver.read(s.card, uint16(start), uint16(length))
 }
