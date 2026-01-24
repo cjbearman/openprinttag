@@ -9,3 +9,4 @@ ENV PATH="/.venv/bin:$PATH:."
 WORKDIR /source_repo
 RUN pip install -r requirements.txt
 WORKDIR /source_repo/utils
+RUN chmod -R 755 /source_repo

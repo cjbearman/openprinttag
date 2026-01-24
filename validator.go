@@ -47,6 +47,13 @@ func (o *OpenPrintTag) Validate() (errors []string, warnings []string) {
 		e, w := validateRegion(o.aux)
 		errors = append(errors, e...)
 		warnings = append(warnings, w...)
+		if o.auxRegionSize != 0 {
+			if o.auxRegionSize < 16 {
+				errors = append(errors, fmt.Sprintf("aux region size is set to %d bytes, specification requires a minimum of 16 bytes", o.auxRegionSize))
+			} else if o.auxRegionSize < 32 {
+				warnings = append(warnings, fmt.Sprintf("aux region size is set to %d bytes, specification recommends at least 32 bytes for practical use", o.auxRegionSize))
+			}
+		}
 	}
 	return
 }

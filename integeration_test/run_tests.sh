@@ -15,8 +15,8 @@ function runtest {
     bash $TESTNAME.golang.commands
 
     # Make hexidecimal copies of both files, because it sucks to debug binary
-    cat $TESTNAME.python.bin | gohexdump > $TESTNAME.python.hex
-    cat $TESTNAME.golang.bin | gohexdump > $TESTNAME.golang.hex
+    cat $TESTNAME.python.bin | ./gohexdump > $TESTNAME.python.hex
+    cat $TESTNAME.golang.bin | ./gohexdump > $TESTNAME.golang.hex
     set +e    
 
     # Now we can look for differences and report as needed
@@ -53,6 +53,8 @@ fi
 set -e
 cd $BASEDIR/../cmd/optag
 go build -o ${BASEDIR}/optag ./optag.go
+cd $BASEDIR/../cmd/gohexdump
+go build -o ${BASEDIR}/gohexdump ./main.go
 set +e
 
 cd $BASEDIR

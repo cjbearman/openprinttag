@@ -49,8 +49,8 @@ type mainInternal struct {
 	ExpirationDate              *uint64                   `cbor:"15,keyasint,omitempty" yaml:"expiration_date,omitempty" opt:"name=expiration_date,key=15"`
 	NominalNettoFullWeight      *float64                  `cbor:"16,keyasint,omitempty" yaml:"nominal_netto_full_weight,omitempty" opt:"name=nominal_netto_full_weight,key=16,recommended"`
 	ActualNettoFullWeight       *float64                  `cbor:"17,keyasint,omitempty" yaml:"actual_netto_full_weight,omitempty" opt:"name=actual_netto_full_weight,key=17,recommended"`
-	NominalFullLength           *float64                  `cbor:"53,keyasint,omitempty" yaml:"nominal_full_length,omitempty" opt:"name=nominal_full_length,key=53"`
-	ActualFullLength            *float64                  `cbor:"54,keyasint,omitempty" yaml:"actual_full_length,omitempty" opt:"name=actual_full_length,key=54"`
+	NominalFullLength           *float64                  `cbor:"53,keyasint,omitempty" yaml:"nominal_full_length,omitempty" opt:"name=nominal_full_length,key=53,recommended"`
+	ActualFullLength            *float64                  `cbor:"54,keyasint,omitempty" yaml:"actual_full_length,omitempty" opt:"name=actual_full_length,key=54,recommended"`
 	EmptyContainerWeight        *float64                  `cbor:"18,keyasint,omitempty" yaml:"empty_container_weight,omitempty" opt:"name=empty_container_weight,key=18,recommended"`
 	PrimaryColor                *ColorRGBA                `cbor:"19,keyasint,omitempty" yaml:"primary_color,flow,omitempty" opt:"name=primary_color,key=19,recommended,rgba"`
 	SecondaryColor0             *ColorRGBA                `cbor:"20,keyasint,omitempty" yaml:"secondary_color_0,flow,omitempty" opt:"name=secondary_color_0,key=20,rgba"`
