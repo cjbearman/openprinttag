@@ -32,7 +32,7 @@ import (
 
 // MaxReadWriteMultiDataSize is the maximum data size for read/write multiple blocks
 // basically a limit that can be supported by the PC/SC and ACR1552-U
-const MaxReadWriteMultiDataSize = 128
+const MaxReadWriteMultiDataSize = 120
 
 // APDUYError represents an error response from an APDU command
 type APDUError struct {
@@ -172,6 +172,10 @@ func (d *commonDriver) direct(card *scard.Card, payload ...byte) (resp []byte, e
 		data := remainder[2 : 2+length]
 		debug("Got code %02xh len %d data: %s", code, length, hex.EncodeToString(data))
 		remainder = remainder[2+length:]
+
+		debug("Our data is len %d:\n%s", len(data), hex.Dump(data))
+		debug("Our remainder is %d:\n%s", len(remainder), hex.Dump(remainder))
+
 		if code == 0x96 {
 			// Code 96 = Response Status, should be 0x00 0x00
 			// the first byte, last nibble is important

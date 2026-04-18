@@ -22,6 +22,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -237,4 +238,14 @@ func TestOversizeRegion(t *testing.T) {
 	_, err := tag.Encode()
 	require.Error(err)
 	assert.Equal("failed to encode aux region: region aux size of 1034 exceeds maximum permissable size of 512 bytes", err.Error())
+}
+
+func TestRealTagPrusamentGalaxyBlackPETG(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+	tagData, err := os.ReadFile("real_tags/prusament_galaxy_black_petg.bin")
+	require.NoError(err)
+	tag, err := openprinttag.Decode(tagData)
+	require.NoError(err)
+	assert.NotNil(tag)
 }
