@@ -32,6 +32,7 @@ type auxInternal struct {
 	Workgroup               *string     `cbor:"1,keyasint,omitempty" yaml:"workgroup,omitempty" opt:"name=workgroup,key=1,max_length=8"`
 	GeneralPurposeRangeUser *string     `cbor:"2,keyasint,omitempty" yaml:"general_purpose_range_user,omitempty" opt:"name=general_purpose_range_user,key=2,max_length=8"`
 	LastStirTime            *uint64     `cbor:"3,keyasint,omitempty" yaml:"last_stir_time,omitempty" opt:"name=last_stir_time,key=3"`
+	StorageLocation         *string     `cbor:"4,keyasint,omitempty" yaml:"storage_location,omitempty" opt:"name=storage_location,key=4,max_length=8"`
 	Unknowns                map[any]any `cbor:"-" yaml:"other,omitempty"`
 }
 
@@ -120,6 +121,27 @@ func (s *AuxRegion) GetLastStirTime() (time.Time, bool) {
 // ClearLastStirTime Clears the value of last_stir_time (3)
 func (s *AuxRegion) ClearLastStirTime() *AuxRegion {
 	s.internal.LastStirTime = nil
+	return s
+}
+
+// SetStorageLocation Sets the value of storage_location (4)
+func (s *AuxRegion) SetStorageLocation(value string) *AuxRegion {
+	s.internal.StorageLocation = &value
+	return s
+}
+
+// GetStorageLocation Gets the value of storage_location (4)
+func (s *AuxRegion) GetStorageLocation() (string, bool) {
+	if s.internal.StorageLocation != nil {
+		return *s.internal.StorageLocation, true
+	}
+
+	return "", false
+}
+
+// ClearStorageLocation Clears the value of storage_location (4)
+func (s *AuxRegion) ClearStorageLocation() *AuxRegion {
+	s.internal.StorageLocation = nil
 	return s
 }
 
