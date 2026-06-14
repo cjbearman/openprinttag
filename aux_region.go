@@ -33,6 +33,9 @@ type auxInternal struct {
 	GeneralPurposeRangeUser *string     `cbor:"2,keyasint,omitempty" yaml:"general_purpose_range_user,omitempty" opt:"name=general_purpose_range_user,key=2,max_length=8"`
 	LastStirTime            *uint64     `cbor:"3,keyasint,omitempty" yaml:"last_stir_time,omitempty" opt:"name=last_stir_time,key=3"`
 	StorageLocation         *string     `cbor:"4,keyasint,omitempty" yaml:"storage_location,omitempty" opt:"name=storage_location,key=4,max_length=8"`
+	PurchaseTime            *uint64     `cbor:"5,keyasint,omitempty" yaml:"purchase_time,omitempty" opt:"name=purchase_time,key=5"`
+	PurchasePrice           *float64    `cbor:"6,keyasint,omitempty" yaml:"purchase_price,omitempty" opt:"name=purchase_price,key=6"`
+	PurchaseCurrency        *string     `cbor:"7,keyasint,omitempty" yaml:"purchase_currency,omitempty" opt:"name=purchase_currency,key=7,max_length=3"`
 	Unknowns                map[any]any `cbor:"-" yaml:"other,omitempty"`
 }
 
@@ -142,6 +145,68 @@ func (s *AuxRegion) GetStorageLocation() (string, bool) {
 // ClearStorageLocation Clears the value of storage_location (4)
 func (s *AuxRegion) ClearStorageLocation() *AuxRegion {
 	s.internal.StorageLocation = nil
+	return s
+}
+
+// SetPurchaseTime Sets the value of purchase_time (5)
+func (s *AuxRegion) SetPurchaseTime(value time.Time) *AuxRegion {
+	ival := uint64(value.Unix())
+	s.internal.PurchaseTime = &ival
+	return s
+}
+
+// GetPurchaseTime Gets the value of purchase_time (5)
+func (s *AuxRegion) GetPurchaseTime() (time.Time, bool) {
+	if s.internal.PurchaseTime != nil {
+		return time.Unix(int64(*s.internal.PurchaseTime), 0), true
+	}
+	return time.Time{}, false
+}
+
+// ClearPurchaseTime Clears the value of purchase_time (5)
+func (s *AuxRegion) ClearPurchaseTime() *AuxRegion {
+	s.internal.PurchaseTime = nil
+	return s
+}
+
+// SetPurchasePrice Sets the value of purchase_price (6)
+func (s *AuxRegion) SetPurchasePrice(value float64) *AuxRegion {
+	s.internal.PurchasePrice = &value
+	return s
+}
+
+// GetPurchasePrice Gets the value of purchase_price (6)
+func (s *AuxRegion) GetPurchasePrice() (float64, bool) {
+	if s.internal.PurchasePrice != nil {
+		return *s.internal.PurchasePrice, true
+	}
+	return 0.0, false
+}
+
+// ClearPurchasePrice Clears the value of purchase_price (6)
+func (s *AuxRegion) ClearPurchasePrice() *AuxRegion {
+	s.internal.PurchasePrice = nil
+	return s
+}
+
+// SetPurchaseCurrency Sets the value of purchase_currency (7)
+func (s *AuxRegion) SetPurchaseCurrency(value string) *AuxRegion {
+	s.internal.PurchaseCurrency = &value
+	return s
+}
+
+// GetPurchaseCurrency Gets the value of purchase_currency (7)
+func (s *AuxRegion) GetPurchaseCurrency() (string, bool) {
+	if s.internal.PurchaseCurrency != nil {
+		return *s.internal.PurchaseCurrency, true
+	}
+
+	return "", false
+}
+
+// ClearPurchaseCurrency Clears the value of purchase_currency (7)
+func (s *AuxRegion) ClearPurchaseCurrency() *AuxRegion {
+	s.internal.PurchaseCurrency = nil
 	return s
 }
 

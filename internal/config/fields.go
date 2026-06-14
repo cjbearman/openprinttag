@@ -199,6 +199,8 @@ func (f Field) GetInternalTypeAndImports() (internalType string, requiredImports
 		return "int", nil
 	case "number":
 		return "float64", nil
+	case "color_lab":
+		return "ColorLab", nil
 	default:
 		panic(fmt.Sprintf("unknown type: -%s-", f.Type()))
 	}

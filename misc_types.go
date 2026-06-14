@@ -173,3 +173,16 @@ func MustNewColor(str string) ColorRGBA {
 	}
 	return c
 }
+
+// ColorLab represents an ColorLab value
+type ColorLab [3]float32
+
+func (c ColorLab) String() string {
+	return fmt.Sprintf("[%f, %f, %f]", c[0], c[1], c[2])
+}
+
+// NewColorLab will generate a ColorLab value from a string
+// in the form of: #LLaaBB or LLaaBB
+func NewColorLab(l, a, b float32) ColorLab {
+	return ColorLab{l, a, b}
+}

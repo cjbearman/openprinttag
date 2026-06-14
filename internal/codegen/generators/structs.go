@@ -154,20 +154,20 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 			templater.WithFilename("int.template").Generate(funcWriter)
 		case "color_rgba":
 			templater.WithFilename("color_rgba.template").Generate(funcWriter)
+		case "color_lab":
+			templater.WithFilename("color_lab.template").Generate(funcWriter)
 		case "string":
 			templater.WithFilename("string.template").Generate(funcWriter)
 		case "timestamp":
 			templater.WithFilename("timestamp.template").Generate(funcWriter)
 		case "enum":
 			templater.WithFilename("enum.template").WithEnumName(field.GetInternalEnumType()).Generate(funcWriter)
-
 		case "enum_array":
 			templater.WithFilename("enum_arr.template").WithEnumName(field.GetInternalEnumType()).Generate(funcWriter)
 		case "uuid":
 			templater.WithFilename("uuid.template").Generate(funcWriter)
 		case "number":
 			templater.WithFilename("number.template").Generate(funcWriter)
-
 		default:
 			panic("Unhanled type " + field.Type())
 		}

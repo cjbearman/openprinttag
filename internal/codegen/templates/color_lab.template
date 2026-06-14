@@ -1,0 +1,20 @@
+#SETTER_COMMENT#
+func (s *#TYPE#) Set#FIELD#(value ColorLab) *#TYPE# {
+    copy :=ColorLab{value[0], value[1], value[2]}
+    s.internal.#FIELD# = &copy
+    return s
+}
+
+#GETTER_COMMENT#
+func (s *#TYPE#) Get#FIELD#() (ColorLab, bool) {
+    if s.internal.#FIELD# != nil {
+        return *s.internal.#FIELD#, true
+    }
+    return ColorLab{0, 0, 0}, false
+}
+
+#CLEAR_COMMENT#
+func (s *#TYPE#) Clear#FIELD#() *#TYPE# {
+    s.internal.#FIELD# = nil
+    return s
+}
