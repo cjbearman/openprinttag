@@ -67,7 +67,8 @@ func TestTagWithMainFields(t *testing.T) {
 		SetMaterialName("PLA Prusa Galaxy Black").
 		SetMaterialUuid(material).
 		SetChamberTemperature(50).
-		SetMaterialClass(openprinttag.MaterialClassFFF)
+		SetMaterialClass(openprinttag.MaterialClassFFF).
+		SetPrimaryColorLab(openprinttag.NewColorLab(1.1, 2.2, 3.3))
 	output, err := tag.Encode()
 	require.NoError(err)
 	require.NotNil(output)
@@ -89,6 +90,7 @@ func TestTagWithMainFields(t *testing.T) {
 	assert.Equal(firstReturn(tag.MainRegion().GetManufacturedDate()), firstReturn(reconstituted.MainRegion().GetManufacturedDate()))
 	assert.Equal(firstReturn(tag.MetaRegion().GetAuxRegionOffset()), firstReturn(reconstituted.MetaRegion().GetAuxRegionOffset()))
 	assert.InDelta(firstReturn(tag.AuxRegion().GetConsumedWeight()), firstReturn(reconstituted.AuxRegion().GetConsumedWeight()), 0.001)
+	assert.Equal(firstReturn(tag.MainRegion().GetPrimaryColorLab()), firstReturn(reconstituted.MainRegion().GetPrimaryColorLab()))
 
 }
 
@@ -112,7 +114,8 @@ func TestTagWithMainAndAuxFields(t *testing.T) {
 		SetMaterialUuid(material).
 		SetChamberTemperature(50).
 		SetMaterialClass(openprinttag.MaterialClassFFF).
-		SetManufacturedDate(time.Now())
+		SetManufacturedDate(time.Now()).
+		SetPrimaryColorLab(openprinttag.NewColorLab(0.11, 0.22, 0.33))
 
 	tag.AuxRegion().
 		SetConsumedWeight(1.234)

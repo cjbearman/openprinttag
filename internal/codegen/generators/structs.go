@@ -90,6 +90,9 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 			continue
 		}
 
+		// Placeholder to allow inclusion of additional elements to the YAML struct tag
+		additionalYamlTags := ""
+
 		// Figure out what opt struct tag we'll put on this field
 		optAnnotations := []string{
 			fmt.Sprintf("%s=%s", st.OptTagName, field.Name()),
@@ -105,22 +108,22 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 			optAnnotations = append(optAnnotations, fmt.Sprintf("%s=%d", st.OptTagMaxLength, field.MaxLength()))
 		}
 		if field.Type() == "color_rgba" {
+			additionalYamlTags = ",flow"
 			optAnnotations = append(optAnnotations, st.OptTagRGBA)
 		}
-
-		// Compile the finalized opt: struct tag
-		optAnnotation := fmt.Sprintf("%s:\"%s\"", st.OptTag, strings.Join(optAnnotations, ","))
+		if field.Type() == "color_lab" {
+			additionalYamlTags = ",flow"
+			optAnnotations = append(optAnnotations, fmt.Sprintf("%s=%s", st.OptTagContainerType, st.OptTagContainerTypeDefinite))
+		}
 
 		theType, imports := field.GetInternalTypeAndImports()
 		for _, item := range imports {
 			importMap[item] = true
 		}
 
-		// Generate fhe field, including struct tags for cbor, json, yaml and our own opt tag
-		additionalYamlTags := ""
-		if field.Type() == "color_rgba" {
-			additionalYamlTags = ",flow"
-		}
+		// Compile the finalized opt: struct tag
+		optAnnotation := fmt.Sprintf("%s:\"%s\"", st.OptTag, strings.Join(optAnnotations, ","))
+
 		fmt.Fprintf(structWriter, "  %s *%s `cbor:\"%d,keyasint,omitempty\" yaml:\"%s%s,omitempty\" %s`\n", field.GetInternalFieldName(), theType, field.Key(), field.Name(), additionalYamlTags, optAnnotation)
 
 		// Now, into the functions writer, we will generate appropriate setter/getter/clearer functions from our templates
@@ -154,20 +157,20 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 			templater.WithFilename("int.template").Generate(funcWriter)
 		case "color_rgba":
 			templater.WithFilename("color_rgba.template").Generate(funcWriter)
+		case "color_lab":
+			templater.WithFilename("color_lab.template").Generate(funcWriter)
 		case "string":
 			templater.WithFilename("string.template").Generate(funcWriter)
 		case "timestamp":
 			templater.WithFilename("timestamp.template").Generate(funcWriter)
 		case "enum":
 			templater.WithFilename("enum.template").WithEnumName(field.GetInternalEnumType()).Generate(funcWriter)
-
 		case "enum_array":
 			templater.WithFilename("enum_arr.template").WithEnumName(field.GetInternalEnumType()).Generate(funcWriter)
 		case "uuid":
 			templater.WithFilename("uuid.template").Generate(funcWriter)
 		case "number":
 			templater.WithFilename("number.template").Generate(funcWriter)
-
 		default:
 			panic("Unhanled type " + field.Type())
 		}

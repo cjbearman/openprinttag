@@ -86,6 +86,11 @@ const (
 	// The most common Nylon for 3D printing. Strong, tough, with low moisture absorption. Great for functional parts.
 	MaterialTypePA12 MaterialType = 10
 
+	// MaterialTypePA612
+	// Polyamide 612
+	// A semi-flexible Nylon with properties between PA6 and PA12. Offers good toughness and lower moisture absorption than PA6.
+	MaterialTypePA612 MaterialType = 42
+
 	// MaterialTypePA66
 	// Polyamide 66
 	// A stiffer and more heat-resistant Nylon compared to PA6, used for durable mechanical parts.
@@ -254,6 +259,7 @@ var MaterialTypeMap = map[uint64]string{
 	8:  "PA6",
 	9:  "PA11",
 	10: "PA12",
+	42: "PA612",
 	11: "PA66",
 	12: "CPE",
 	13: "TPE",

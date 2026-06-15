@@ -40,7 +40,7 @@ type mainInternal struct {
 	BrandSpecificMaterialId     *string                   `cbor:"7,keyasint,omitempty" yaml:"brand_specific_material_id,omitempty" opt:"name=brand_specific_material_id,key=7,max_length=16"`
 	MaterialClass               *MaterialClass            `cbor:"8,keyasint,omitempty" yaml:"material_class,omitempty" opt:"name=material_class,key=8,required"`
 	MaterialType                *MaterialType             `cbor:"9,keyasint,omitempty" yaml:"material_type,omitempty" opt:"name=material_type,key=9,recommended"`
-	MaterialName                *string                   `cbor:"10,keyasint,omitempty" yaml:"material_name,omitempty" opt:"name=material_name,key=10,recommended,max_length=31"`
+	MaterialName                *string                   `cbor:"10,keyasint,omitempty" yaml:"material_name,omitempty" opt:"name=material_name,key=10,recommended,max_length=63"`
 	MaterialAbbreviation        *string                   `cbor:"52,keyasint,omitempty" yaml:"material_abbreviation,omitempty" opt:"name=material_abbreviation,key=52,max_length=7"`
 	BrandName                   *string                   `cbor:"11,keyasint,omitempty" yaml:"brand_name,omitempty" opt:"name=brand_name,key=11,recommended,max_length=31"`
 	WriteProtection             *WriteProtection          `cbor:"13,keyasint,omitempty" yaml:"write_protection,omitempty" opt:"name=write_protection,key=13"`
@@ -53,6 +53,8 @@ type mainInternal struct {
 	ActualFullLength            *float64                  `cbor:"54,keyasint,omitempty" yaml:"actual_full_length,omitempty" opt:"name=actual_full_length,key=54,recommended"`
 	EmptyContainerWeight        *float64                  `cbor:"18,keyasint,omitempty" yaml:"empty_container_weight,omitempty" opt:"name=empty_container_weight,key=18,recommended"`
 	PrimaryColor                *ColorRGBA                `cbor:"19,keyasint,omitempty" yaml:"primary_color,flow,omitempty" opt:"name=primary_color,key=19,recommended,rgba"`
+	PrimaryColorLab             *ColorLab                 `cbor:"59,keyasint,omitempty" yaml:"primary_color_lab,flow,omitempty" opt:"name=primary_color_lab,key=59,container_type=definite"`
+	PrimaryColorRal             *string                   `cbor:"60,keyasint,omitempty" yaml:"primary_color_ral,omitempty" opt:"name=primary_color_ral,key=60,max_length=16"`
 	SecondaryColor0             *ColorRGBA                `cbor:"20,keyasint,omitempty" yaml:"secondary_color_0,flow,omitempty" opt:"name=secondary_color_0,key=20,rgba"`
 	SecondaryColor1             *ColorRGBA                `cbor:"21,keyasint,omitempty" yaml:"secondary_color_1,flow,omitempty" opt:"name=secondary_color_1,key=21,rgba"`
 	SecondaryColor2             *ColorRGBA                `cbor:"22,keyasint,omitempty" yaml:"secondary_color_2,flow,omitempty" opt:"name=secondary_color_2,key=22,rgba"`
@@ -573,6 +575,48 @@ func (s *MainRegion) GetPrimaryColor() (ColorRGBA, bool) {
 // ClearPrimaryColor Clears the value of primary_color (19)
 func (s *MainRegion) ClearPrimaryColor() *MainRegion {
 	s.internal.PrimaryColor = nil
+	return s
+}
+
+// SetPrimaryColorLab Sets the value of primary_color_lab (59)
+func (s *MainRegion) SetPrimaryColorLab(value ColorLab) *MainRegion {
+	copy := ColorLab{value[0], value[1], value[2]}
+	s.internal.PrimaryColorLab = &copy
+	return s
+}
+
+// GetPrimaryColorLab Gets the value of primary_color_lab (59)
+func (s *MainRegion) GetPrimaryColorLab() (ColorLab, bool) {
+	if s.internal.PrimaryColorLab != nil {
+		return *s.internal.PrimaryColorLab, true
+	}
+	return ColorLab{}, false
+}
+
+// ClearPrimaryColorLab Clears the value of primary_color_lab (59)
+func (s *MainRegion) ClearPrimaryColorLab() *MainRegion {
+	s.internal.PrimaryColorLab = nil
+	return s
+}
+
+// SetPrimaryColorRal Sets the value of primary_color_ral (60)
+func (s *MainRegion) SetPrimaryColorRal(value string) *MainRegion {
+	s.internal.PrimaryColorRal = &value
+	return s
+}
+
+// GetPrimaryColorRal Gets the value of primary_color_ral (60)
+func (s *MainRegion) GetPrimaryColorRal() (string, bool) {
+	if s.internal.PrimaryColorRal != nil {
+		return *s.internal.PrimaryColorRal, true
+	}
+
+	return "", false
+}
+
+// ClearPrimaryColorRal Clears the value of primary_color_ral (60)
+func (s *MainRegion) ClearPrimaryColorRal() *MainRegion {
+	s.internal.PrimaryColorRal = nil
 	return s
 }
 

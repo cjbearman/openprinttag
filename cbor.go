@@ -31,6 +31,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cjbearman/openprinttag/structtags"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/x448/float16"
 )
@@ -45,9 +46,10 @@ const (
 )
 
 type reflectionMapItem struct {
-	field *reflect.Value
-	name  string
-	key   int
+	field   *reflect.Value
+	name    string
+	key     int
+	optTags map[string]string
 }
 
 // encodeToCBOR encodes a specific region in cbor
@@ -119,20 +121,31 @@ func encodeAsIndefiniteMap(r Region) ([]byte, error) {
 					return nil, err
 				}
 			} else {
-				// This is a []..something else and must be encoded as an indefinite array
-				if err = enc.StartIndefiniteArray(); err != nil {
-					return nil, err
-				}
-				for n := 0; n < info.field.Elem().Len(); n++ {
-					sliceContent := info.field.Elem().Index(n).Interface()
-					if err = enc.Encode(sliceContent); err != nil {
+				// This is a []..something else and must be encoded as an array
+				switch info.optTags[structtags.OptTagContainerType] {
+				case structtags.OptTagContainerTypeDefinite:
+					// OPT tag designates definite encoding
+					err = enc.Encode(info.field.Elem().Interface())
+				default:
+					// Opt tag does not specify encoding or designates indefinite
+					// This is our default position based on historical encoding choices but should probably be changed to definite at some point
+					if err = enc.StartIndefiniteArray(); err != nil {
+						return nil, err
+					}
+					for n := 0; n < info.field.Elem().Len(); n++ {
+						sliceContent := info.field.Elem().Index(n).Interface()
+						if err = enc.Encode(sliceContent); err != nil {
+							return nil, err
+						}
+					}
+					if err = enc.EndIndefinite(); err != nil {
 						return nil, err
 					}
 				}
-				if err = enc.EndIndefinite(); err != nil {
-					return nil, err
-				}
 			}
+		case reflect.Map:
+			// There is no use case for this currently
+			panic("Maps not supported within open print tag regions")
 		default:
 			return nil, fmt.Errorf("cannot encode %s", kind)
 		}
@@ -234,9 +247,10 @@ func mapRegion(internal *reflect.Value) map[int]reflectionMapItem {
 		}
 
 		theMap[key] = reflectionMapItem{
-			field: &field,
-			name:  name,
-			key:   key,
+			field:   &field,
+			name:    name,
+			key:     key,
+			optTags: structtags.ReadOptTags(internal.Type().Field(i).Tag),
 		}
 	}
 	return theMap
@@ -259,8 +273,8 @@ func compressFloat(orig any, opts *RegionOptions) any {
 		panic("not a valid float")
 	}
 
-	// First, we'll try and optimize the number down to smallest possible integer
-	// without loss
+	// We do our best to optimize the number down to the smallest possible representation without loss, starting with integers
+	// If we can downconvert with no loss, then that's our best choice
 
 	// Is the number negative
 	if original < 0 {
@@ -282,6 +296,7 @@ func compressFloat(orig any, opts *RegionOptions) any {
 		return uint16(original)
 	}
 
+	// AN integer doesn't work, so let's go float. Depending on encoding options, we may be able to downconvert to float16 or float32 without loss
 	// It doesn't matter that we've upscaled to a float64, because
 	// the cbor library automatically optimizes to the smallest usable
 	// float size without loss
