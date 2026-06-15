@@ -53,7 +53,7 @@ type mainInternal struct {
 	ActualFullLength            *float64                  `cbor:"54,keyasint,omitempty" yaml:"actual_full_length,omitempty" opt:"name=actual_full_length,key=54,recommended"`
 	EmptyContainerWeight        *float64                  `cbor:"18,keyasint,omitempty" yaml:"empty_container_weight,omitempty" opt:"name=empty_container_weight,key=18,recommended"`
 	PrimaryColor                *ColorRGBA                `cbor:"19,keyasint,omitempty" yaml:"primary_color,flow,omitempty" opt:"name=primary_color,key=19,recommended,rgba"`
-	PrimaryColorLab             *ColorLab                 `cbor:"59,keyasint,omitempty" yaml:"primary_color_lab,omitempty" opt:"name=primary_color_lab,key=59"`
+	PrimaryColorLab             *ColorLab                 `cbor:"59,keyasint,omitempty" yaml:"primary_color_lab,flow,omitempty" opt:"name=primary_color_lab,key=59,container_type=definite"`
 	PrimaryColorRal             *string                   `cbor:"60,keyasint,omitempty" yaml:"primary_color_ral,omitempty" opt:"name=primary_color_ral,key=60,max_length=16"`
 	SecondaryColor0             *ColorRGBA                `cbor:"20,keyasint,omitempty" yaml:"secondary_color_0,flow,omitempty" opt:"name=secondary_color_0,key=20,rgba"`
 	SecondaryColor1             *ColorRGBA                `cbor:"21,keyasint,omitempty" yaml:"secondary_color_1,flow,omitempty" opt:"name=secondary_color_1,key=21,rgba"`

@@ -25,8 +25,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"strings"
 
+	"github.com/cjbearman/openprinttag/structtags"
 	st "github.com/cjbearman/openprinttag/structtags"
 )
 
@@ -81,15 +81,8 @@ func validateRegion(region Region) (errors, warnings []string) {
 		// The field (as reflect.Field)
 		field := internal.Type().Field(i)
 
-		// The opt tag set
-		tag := field.Tag.Get(st.OptTag)
-		if tag == "" {
-			// No opt tag, since all our fields have tags, we can skip this field as being of no interest
-			continue
-		}
-
 		// Decode the opt tag into it's constituent parts
-		tagMap := decodeOptTag(tag)
+		tagMap := structtags.ReadOptTags(field.Tag)
 
 		// The native field name
 		nativeName := tagMap[st.OptTagName]
@@ -164,15 +157,8 @@ func optCheck(region Region) (errors, warnings []string) {
 		// The field (as reflect.Field)
 		field := internal.Type().Field(i)
 
-		// The opt tag set
-		tag := field.Tag.Get(st.OptTag)
-		if tag == "" {
-			// No opt tag, since all our fields have tags, we can skip this field as being of no interest
-			continue
-		}
-
 		// Decode the opt tag into it's constituent parts
-		tagMap := decodeOptTag(tag)
+		tagMap := structtags.ReadOptTags(field.Tag)
 
 		// The native field name
 		nativeName := tagMap[st.OptTagName]
@@ -258,22 +244,4 @@ func getCustomErrorsAndWarnings(region Region) (errors, warnings []string) {
 func genErrorOrWarning(name, key, nativeName, format string, v ...any) string {
 	preamble := fmt.Sprintf("field %s (%s/%s) ", name, nativeName, key)
 	return fmt.Sprintf(preamble+format, v...)
-}
-
-// decodeOptTag takes the value of the opt struct tag and decodes it to a map
-// containing key (the subtag name) and value (the optional subtag value)
-func decodeOptTag(optTag string) map[string]string {
-	tagBits := strings.Split(optTag, ",")
-	tagMap := make(map[string]string, len(tagBits))
-
-	for _, tagBit := range tagBits {
-		tagSplit := strings.Split(tagBit, "=")
-		if len(tagSplit) == 1 {
-			tagMap[tagSplit[0]] = ""
-		} else if len(tagSplit) == 2 {
-
-			tagMap[tagSplit[0]] = tagSplit[1]
-		}
-	}
-	return tagMap
 }

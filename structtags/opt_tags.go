@@ -21,15 +21,40 @@
 // SOFTWARE.
 package structtags
 
+import (
+	"reflect"
+	"strings"
+)
+
 // Our struct tag constants are used by code generation, and need to be in a separate package
 // other than the main package, otherwise code generation will fail to compile if it has previously
 // generated files with errors
 const (
-	OptTag            = "opt"
-	OptTagName        = "name"
-	OptTagKey         = "key"
-	OptTagRequired    = "required"
-	OptTagRecommended = "recommended"
-	OptTagMaxLength   = "max_length"
-	OptTagRGBA        = "rgba"
+	OptTag                        = "opt"
+	OptTagName                    = "name"
+	OptTagKey                     = "key"
+	OptTagRequired                = "required"
+	OptTagRecommended             = "recommended"
+	OptTagMaxLength               = "max_length"
+	OptTagRGBA                    = "rgba"
+	OptTagContainerType           = "container_type"
+	OptTagContainerTypeIndefinite = "indefinite"
+	OptTagContainerTypeDefinite   = "definite"
 )
+
+// readOptTags will return a map of string[string] containing elements from the opt struct tag,
+// where the key is the string before the = and the value is the string after the = (if present)
+func ReadOptTags(structTag reflect.StructTag) (optTags map[string]string) {
+	optTags = make(map[string]string)
+	for _, tagElement := range strings.Split(strings.TrimSpace(structTag.Get(OptTag)), ",") {
+		if tagElement != "" {
+			tagBits := strings.SplitN(tagElement, "=", 2)
+			if len(tagBits) == 1 {
+				optTags[strings.TrimSpace(tagBits[0])] = ""
+			} else if len(tagBits) == 2 {
+				optTags[strings.TrimSpace(tagBits[0])] = strings.TrimSpace(tagBits[1])
+			}
+		}
+	}
+	return
+}
