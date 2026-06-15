@@ -10,7 +10,7 @@ func (s *#TYPE#) Get#FIELD#() (ColorLab, bool) {
     if s.internal.#FIELD# != nil {
         return *s.internal.#FIELD#, true
     }
-    return ColorLab{0, 0, 0}, false
+    return ColorLab{}, false
 }
 
 #CLEAR_COMMENT#

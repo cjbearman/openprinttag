@@ -590,7 +590,7 @@ func (s *MainRegion) GetPrimaryColorLab() (ColorLab, bool) {
 	if s.internal.PrimaryColorLab != nil {
 		return *s.internal.PrimaryColorLab, true
 	}
-	return ColorLab{0, 0, 0}, false
+	return ColorLab{}, false
 }
 
 // ClearPrimaryColorLab Clears the value of primary_color_lab (59)
