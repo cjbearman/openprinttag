@@ -40,6 +40,7 @@ const (
 	OptTagContainerType           = "container_type"
 	OptTagContainerTypeIndefinite = "indefinite"
 	OptTagContainerTypeDefinite   = "definite"
+	OptTagDeprecated              = "deprecated"
 )
 
 // readOptTags will return a map of string[string] containing elements from the opt struct tag,

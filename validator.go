@@ -110,6 +110,12 @@ func validateRegion(region Region) (errors, warnings []string) {
 		if isRecommended && valueIsNil {
 			warnings = append(warnings, genErrorOrWarning(name, key, nativeName, "is recommended"))
 		}
+
+		// Is this deprecated, if so warning if set
+		_, isDeprecated := tagMap[st.OptTagDeprecated]
+		if isDeprecated && !valueIsNil {
+			warnings = append(warnings, genErrorOrWarning(name, key, nativeName, "is deprecated"))
+		}
 	}
 	return
 }
@@ -136,10 +142,11 @@ func (o *OpenPrintTag) OptCheck() (errors []string, warnings []string) {
 
 // optCheck returns errors and warnings for a specific region
 func optCheck(region Region) (errors, warnings []string) {
+	var internal reflect.Value
 	defer func() {
 		// Just in case something goes catastrophically wrong
 		if r := recover(); r != nil {
-			errors = append(errors, fmt.Sprintf("panic during validation: %v", r))
+			errors = append(errors, fmt.Sprintf("panic during validation at field %v: %v", internal, r))
 		}
 	}()
 
@@ -147,10 +154,11 @@ func optCheck(region Region) (errors, warnings []string) {
 	obj := reflect.ValueOf(region).Elem()
 
 	// It must have an internal field, get that
-	internal := obj.FieldByName("internal")
+	internal = obj.FieldByName("internal")
 
 	// Iterate through all fields in the internal struct
 	for i := 0; i < internal.NumField(); i++ {
+
 		// The field name
 		name := internal.Type().Field(i).Name
 
@@ -174,7 +182,10 @@ func optCheck(region Region) (errors, warnings []string) {
 		if fieldValue.IsNil() {
 			continue
 		}
-		value = fieldValue.Elem()
+
+		if field.Type.Kind() != reflect.Map {
+			value = fieldValue.Elem()
+		}
 
 		// Check for max length
 		maxLenStr, found := tagMap[st.OptTagMaxLength]

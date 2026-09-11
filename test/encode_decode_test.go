@@ -252,3 +252,14 @@ func TestRealTagPrusamentGalaxyBlackPETG(t *testing.T) {
 	require.NoError(err)
 	assert.NotNil(tag)
 }
+
+func TestDeprecationValidationError(t *testing.T) {
+	assert := assert.New(t)
+	tag := openprinttag.NewOpenPrintTag().
+		WithAuxRegionSize(32).
+		WithSize(304)
+	tag.MainRegion().SetMinNozzleDiameter(10.0)
+	_, warns := tag.Validate()
+	assert.NotEmpty(warns)
+	assert.Contains(warns, "field MinNozzleDiameter (min_nozzle_diameter/33) is deprecated")
+}

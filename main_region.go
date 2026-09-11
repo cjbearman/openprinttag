@@ -64,10 +64,10 @@ type mainInternal struct {
 	Tags                        *[]Tag                    `cbor:"28,keyasint,omitempty" yaml:"tags,omitempty" opt:"name=tags,key=28,recommended,max_length=16"`
 	Certifications              *[]MaterialCertifications `cbor:"56,keyasint,omitempty" yaml:"certifications,omitempty" opt:"name=certifications,key=56,max_length=8"`
 	Density                     *float64                  `cbor:"29,keyasint,omitempty" yaml:"density,omitempty" opt:"name=density,key=29,recommended"`
-	FilamentDiameter            *float64                  `cbor:"30,keyasint,omitempty" yaml:"filament_diameter,omitempty" opt:"name=filament_diameter,key=30"`
-	ShoreHardnessA              *int                      `cbor:"31,keyasint,omitempty" yaml:"shore_hardness_a,omitempty" opt:"name=shore_hardness_a,key=31"`
-	ShoreHardnessD              *int                      `cbor:"32,keyasint,omitempty" yaml:"shore_hardness_d,omitempty" opt:"name=shore_hardness_d,key=32"`
-	MinNozzleDiameter           *float64                  `cbor:"33,keyasint,omitempty" yaml:"min_nozzle_diameter,omitempty" opt:"name=min_nozzle_diameter,key=33"`
+	FilamentDiameterV2          *int                      `cbor:"61,keyasint,omitempty" yaml:"filament_diameter_v2,omitempty" opt:"name=filament_diameter_v2,key=61"`
+	HardnessShoreA              *int                      `cbor:"31,keyasint,omitempty" yaml:"hardness_shore_a,omitempty" opt:"name=hardness_shore_a,key=31"`
+	HardnessShoreD              *int                      `cbor:"32,keyasint,omitempty" yaml:"hardness_shore_d,omitempty" opt:"name=hardness_shore_d,key=32"`
+	MinNozzleDiameterV2         *int                      `cbor:"62,keyasint,omitempty" yaml:"min_nozzle_diameter_v2,omitempty" opt:"name=min_nozzle_diameter_v2,key=62"`
 	MinPrintTemperature         *int                      `cbor:"34,keyasint,omitempty" yaml:"min_print_temperature,omitempty" opt:"name=min_print_temperature,key=34,recommended"`
 	MaxPrintTemperature         *int                      `cbor:"35,keyasint,omitempty" yaml:"max_print_temperature,omitempty" opt:"name=max_print_temperature,key=35,recommended"`
 	PreheatTemperature          *int                      `cbor:"36,keyasint,omitempty" yaml:"preheat_temperature,omitempty" opt:"name=preheat_temperature,key=36,recommended"`
@@ -88,6 +88,8 @@ type mainInternal struct {
 	CureWavelength              *int                      `cbor:"51,keyasint,omitempty" yaml:"cure_wavelength,omitempty" opt:"name=cure_wavelength,key=51"`
 	DryingTemperature           *int                      `cbor:"57,keyasint,omitempty" yaml:"drying_temperature,omitempty" opt:"name=drying_temperature,key=57"`
 	DryingTime                  *int                      `cbor:"58,keyasint,omitempty" yaml:"drying_time,omitempty" opt:"name=drying_time,key=58"`
+	FilamentDiameter            *float64                  `cbor:"30,keyasint,omitempty" yaml:"filament_diameter,omitempty" opt:"name=filament_diameter,key=30,deprecated"`
+	MinNozzleDiameter           *float64                  `cbor:"33,keyasint,omitempty" yaml:"min_nozzle_diameter,omitempty" opt:"name=min_nozzle_diameter,key=33,deprecated"`
 	Unknowns                    map[any]any               `cbor:"-" yaml:"other,omitempty"`
 }
 
@@ -834,83 +836,83 @@ func (s *MainRegion) ClearDensity() *MainRegion {
 	return s
 }
 
-// SetFilamentDiameter Sets the value of filament_diameter (30)
-func (s *MainRegion) SetFilamentDiameter(value float64) *MainRegion {
-	s.internal.FilamentDiameter = &value
+// SetFilamentDiameterV2 Sets the value of filament_diameter_v2 (61)
+func (s *MainRegion) SetFilamentDiameterV2(value int) *MainRegion {
+	s.internal.FilamentDiameterV2 = &value
 	return s
 }
 
-// GetFilamentDiameter Gets the value of filament_diameter (30)
-func (s *MainRegion) GetFilamentDiameter() (float64, bool) {
-	if s.internal.FilamentDiameter != nil {
-		return *s.internal.FilamentDiameter, true
-	}
-	return 0.0, false
-}
-
-// ClearFilamentDiameter Clears the value of filament_diameter (30)
-func (s *MainRegion) ClearFilamentDiameter() *MainRegion {
-	s.internal.FilamentDiameter = nil
-	return s
-}
-
-// SetShoreHardnessA Sets the value of shore_hardness_a (31)
-func (s *MainRegion) SetShoreHardnessA(value int) *MainRegion {
-	s.internal.ShoreHardnessA = &value
-	return s
-}
-
-// GetShoreHardnessA Gets the value of shore_hardness_a (31)
-func (s *MainRegion) GetShoreHardnessA() (int, bool) {
-	if s.internal.ShoreHardnessA != nil {
-		return *s.internal.ShoreHardnessA, true
+// GetFilamentDiameterV2 Gets the value of filament_diameter_v2 (61)
+func (s *MainRegion) GetFilamentDiameterV2() (int, bool) {
+	if s.internal.FilamentDiameterV2 != nil {
+		return *s.internal.FilamentDiameterV2, true
 	}
 	return 0, false
 }
 
-// ClearShoreHardnessA Clears the value of shore_hardness_a (31)
-func (s *MainRegion) ClearShoreHardnessA() *MainRegion {
-	s.internal.ShoreHardnessA = nil
+// ClearFilamentDiameterV2 Clears the value of filament_diameter_v2 (61)
+func (s *MainRegion) ClearFilamentDiameterV2() *MainRegion {
+	s.internal.FilamentDiameterV2 = nil
 	return s
 }
 
-// SetShoreHardnessD Sets the value of shore_hardness_d (32)
-func (s *MainRegion) SetShoreHardnessD(value int) *MainRegion {
-	s.internal.ShoreHardnessD = &value
+// SetHardnessShoreA Sets the value of hardness_shore_a (31)
+func (s *MainRegion) SetHardnessShoreA(value int) *MainRegion {
+	s.internal.HardnessShoreA = &value
 	return s
 }
 
-// GetShoreHardnessD Gets the value of shore_hardness_d (32)
-func (s *MainRegion) GetShoreHardnessD() (int, bool) {
-	if s.internal.ShoreHardnessD != nil {
-		return *s.internal.ShoreHardnessD, true
+// GetHardnessShoreA Gets the value of hardness_shore_a (31)
+func (s *MainRegion) GetHardnessShoreA() (int, bool) {
+	if s.internal.HardnessShoreA != nil {
+		return *s.internal.HardnessShoreA, true
 	}
 	return 0, false
 }
 
-// ClearShoreHardnessD Clears the value of shore_hardness_d (32)
-func (s *MainRegion) ClearShoreHardnessD() *MainRegion {
-	s.internal.ShoreHardnessD = nil
+// ClearHardnessShoreA Clears the value of hardness_shore_a (31)
+func (s *MainRegion) ClearHardnessShoreA() *MainRegion {
+	s.internal.HardnessShoreA = nil
 	return s
 }
 
-// SetMinNozzleDiameter Sets the value of min_nozzle_diameter (33)
-func (s *MainRegion) SetMinNozzleDiameter(value float64) *MainRegion {
-	s.internal.MinNozzleDiameter = &value
+// SetHardnessShoreD Sets the value of hardness_shore_d (32)
+func (s *MainRegion) SetHardnessShoreD(value int) *MainRegion {
+	s.internal.HardnessShoreD = &value
 	return s
 }
 
-// GetMinNozzleDiameter Gets the value of min_nozzle_diameter (33)
-func (s *MainRegion) GetMinNozzleDiameter() (float64, bool) {
-	if s.internal.MinNozzleDiameter != nil {
-		return *s.internal.MinNozzleDiameter, true
+// GetHardnessShoreD Gets the value of hardness_shore_d (32)
+func (s *MainRegion) GetHardnessShoreD() (int, bool) {
+	if s.internal.HardnessShoreD != nil {
+		return *s.internal.HardnessShoreD, true
 	}
-	return 0.0, false
+	return 0, false
 }
 
-// ClearMinNozzleDiameter Clears the value of min_nozzle_diameter (33)
-func (s *MainRegion) ClearMinNozzleDiameter() *MainRegion {
-	s.internal.MinNozzleDiameter = nil
+// ClearHardnessShoreD Clears the value of hardness_shore_d (32)
+func (s *MainRegion) ClearHardnessShoreD() *MainRegion {
+	s.internal.HardnessShoreD = nil
+	return s
+}
+
+// SetMinNozzleDiameterV2 Sets the value of min_nozzle_diameter_v2 (62)
+func (s *MainRegion) SetMinNozzleDiameterV2(value int) *MainRegion {
+	s.internal.MinNozzleDiameterV2 = &value
+	return s
+}
+
+// GetMinNozzleDiameterV2 Gets the value of min_nozzle_diameter_v2 (62)
+func (s *MainRegion) GetMinNozzleDiameterV2() (int, bool) {
+	if s.internal.MinNozzleDiameterV2 != nil {
+		return *s.internal.MinNozzleDiameterV2, true
+	}
+	return 0, false
+}
+
+// ClearMinNozzleDiameterV2 Clears the value of min_nozzle_diameter_v2 (62)
+func (s *MainRegion) ClearMinNozzleDiameterV2() *MainRegion {
+	s.internal.MinNozzleDiameterV2 = nil
 	return s
 }
 
@@ -1326,6 +1328,58 @@ func (s *MainRegion) GetDryingTime() (int, bool) {
 // ClearDryingTime Clears the value of drying_time (58)
 func (s *MainRegion) ClearDryingTime() *MainRegion {
 	s.internal.DryingTime = nil
+	return s
+}
+
+// SetFilamentDiameter Sets the value of filament_diameter (30)
+//
+// Deprecated: Replaced by filament_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) SetFilamentDiameter(value float64) *MainRegion {
+	s.internal.FilamentDiameter = &value
+	return s
+}
+
+// GetFilamentDiameter Gets the value of filament_diameter (30)
+//
+// Deprecated: Replaced by filament_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) GetFilamentDiameter() (float64, bool) {
+	if s.internal.FilamentDiameter != nil {
+		return *s.internal.FilamentDiameter, true
+	}
+	return 0.0, false
+}
+
+// ClearFilamentDiameter Clears the value of filament_diameter (30)
+//
+// Deprecated: Replaced by filament_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) ClearFilamentDiameter() *MainRegion {
+	s.internal.FilamentDiameter = nil
+	return s
+}
+
+// SetMinNozzleDiameter Sets the value of min_nozzle_diameter (33)
+//
+// Deprecated: Replaced by min_nozzle_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) SetMinNozzleDiameter(value float64) *MainRegion {
+	s.internal.MinNozzleDiameter = &value
+	return s
+}
+
+// GetMinNozzleDiameter Gets the value of min_nozzle_diameter (33)
+//
+// Deprecated: Replaced by min_nozzle_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) GetMinNozzleDiameter() (float64, bool) {
+	if s.internal.MinNozzleDiameter != nil {
+		return *s.internal.MinNozzleDiameter, true
+	}
+	return 0.0, false
+}
+
+// ClearMinNozzleDiameter Clears the value of min_nozzle_diameter (33)
+//
+// Deprecated: Replaced by min_nozzle_diameter_v2 which uses µm instead of mm
+func (s *MainRegion) ClearMinNozzleDiameter() *MainRegion {
+	s.internal.MinNozzleDiameter = nil
 	return s
 }
 

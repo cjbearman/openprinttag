@@ -34,19 +34,20 @@ import (
 
 // fieldYAML is the internal decoder for fields
 type fieldYAML struct {
-	Key              int    `yaml:"key"`
-	Name             string `yaml:"name"`
-	Type             string `yaml:"type"`
-	Unit             string `yaml:"unit"`
-	Description      any    `yaml:"description"`
-	Category         string `yaml:"category"`
-	ItemsFile        string `yaml:"items_file"`
-	NameField        string `yaml:"name_field"`
-	DisplayNameField string `yaml:"display_name_field"`
-	Required         string `yaml:"required"`
-	Example          string `yaml:"example"`
-	MaxLength        int    `yaml:"max_length"`
-	Deprecated       bool   `yaml:"deprecated"`
+	Key                int    `yaml:"key"`
+	Name               string `yaml:"name"`
+	Type               string `yaml:"type"`
+	Unit               string `yaml:"unit"`
+	Description        any    `yaml:"description"`
+	Category           string `yaml:"category"`
+	ItemsFile          string `yaml:"items_file"`
+	NameField          string `yaml:"name_field"`
+	DisplayNameField   string `yaml:"display_name_field"`
+	Required           string `yaml:"required"`
+	Example            string `yaml:"example"`
+	MaxLength          int    `yaml:"max_length"`
+	Deprecated         bool   `yaml:"deprecated"`
+	DeprecationMessage string `yaml:"deprecation_message"`
 }
 
 // Field is the public representation of a field
@@ -123,6 +124,10 @@ func (f Field) IsDeprecated() bool {
 	return f.yaml.Deprecated
 }
 
+func (f Field) DeprecationMessage() string {
+	return f.yaml.DeprecationMessage
+}
+
 func (f Field) EnumItemsFile() string {
 	return f.yaml.ItemsFile
 }
@@ -145,7 +150,38 @@ Deprecated: %t`, f.Name(), f.Key(), f.Type(), f.Unit(), f.Description(),
 }
 
 // loadFields loads fields from the specified yaml file
-func loadFields(filename string) ([]Field, error) {
+func loadFields(filename string, deprecations string) ([]Field, error) {
+
+	fields, err := loadFieldsFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed loading primary fields from %s: %v", filename, err)
+	}
+
+	deps, err := loadFieldsFile(deprecations)
+	if err != nil {
+		return nil, fmt.Errorf("Failed loading deprecations from %s: %v", deprecations, err)
+	}
+
+	for _, dep := range deps {
+		if fieldExists(fields, dep.Key()) {
+			fmt.Fprintf(os.Stderr, "Field with ID %d exists in primary definitions (%s) as well as deprecations (%s). Deprecated field has overwritten the original.\n", dep.Key(), filename, deprecations)
+		}
+		fields = append(fields, dep)
+	}
+
+	return fields, nil
+}
+
+func fieldExists(fields []Field, id int) bool {
+	for _, field := range fields {
+		if field.Key() == id {
+			return true
+		}
+	}
+	return false
+}
+
+func loadFieldsFile(filename string) ([]Field, error) {
 	f, err := os.Open(dataFileName(filename))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load fields from %s: %w", filename, err)
@@ -202,7 +238,7 @@ func (f Field) GetInternalTypeAndImports() (internalType string, requiredImports
 	case "color_lab":
 		return "ColorLab", nil
 	default:
-		panic(fmt.Sprintf("unknown type: -%s-", f.Type()))
+		panic(fmt.Sprintf("unknown type: \"%s\" from field:\n%s", f.Type(), f.String()))
 	}
 }
 

@@ -29,8 +29,11 @@ import (
 )
 
 const (
-	ConfigNFCV   = "config_nfcv.yaml"
-	ConfigNoRoot = "config_noroot.yaml"
+	ConfigNFCV           = "config_nfcv.yaml"
+	ConfigNoRoot         = "config_noroot.yaml"
+	MetaDeprecationsFile = "deprecations/meta.yaml"
+	MainDeprecationsFile = "deprecations/main.yaml"
+	AuxDeprecationsFile  = "deprecations/aux.yaml"
 )
 
 type ConfigYAML struct {
@@ -90,15 +93,16 @@ func (c *Config) load() error {
 	}
 	c.yaml = y
 
-	c.meta, err = loadFields(c.yaml.MetaFieldsFileName)
+	c.meta, err = loadFields(c.yaml.MetaFieldsFileName, MetaDeprecationsFile)
 	if err != nil {
 		return fmt.Errorf("failed to load meta fields: %w", err)
 	}
-	c.main, err = loadFields(c.yaml.MainFieldsFileName)
+	c.main, err = loadFields(c.yaml.MainFieldsFileName, MainDeprecationsFile)
 	if err != nil {
 		return fmt.Errorf("failed to load main fields: %w", err)
 	}
-	c.aux, err = loadFields(c.yaml.AuxFieldsFileName)
+
+	c.aux, err = loadFields(c.yaml.AuxFieldsFileName, AuxDeprecationsFile)
 	if err != nil {
 		return fmt.Errorf("failed to load aux fields: %w", err)
 	}

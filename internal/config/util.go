@@ -25,13 +25,25 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func dataFileName(filename string) string {
+
+	if strings.HasPrefix(filename, "deprecations/") {
+		// Special case for deprecations files
+		absoluteFilename := filepath.Join(depsDir(), filename)
+		if _, err := os.Stat(absoluteFilename); err == nil {
+			return absoluteFilename
+		}
+		panic(fmt.Sprintf("Unable to stat %s", absoluteFilename))
+	}
+
 	absoluteFilename := filepath.Join(rootDir(), filename)
 	if _, err := os.Stat(absoluteFilename); err == nil {
 		return absoluteFilename
 	}
+
 	panic(fmt.Sprintf("Unable to stat %s", absoluteFilename))
 }
 
@@ -57,4 +69,29 @@ func rootDir() string {
 	}
 
 	return dataDir
+}
+
+func depsDir() string {
+	// The CWD will be the directory where the go generate annotation is, which is internal/codegen
+	// This is guaranteed by go generate spec..
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(fmt.Sprintf("Cannot find working directory: %v", err))
+	}
+
+	// We want the source_repo/data directory from the second parent of this CWD
+	parent := filepath.Dir(filepath.Dir(cwd))
+	dataDir := filepath.Join(parent, "internal")
+
+	// Make sure this is actually a directory
+	st, err := os.Stat(dataDir)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to stat deprecations directory (%s), was it checked out?: %v", dataDir, err))
+	}
+	if !st.IsDir() {
+		panic(fmt.Sprintf("Deprecations directory (%s) does not appear to be a directory", dataDir))
+	}
+
+	return dataDir
+
 }

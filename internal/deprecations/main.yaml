@@ -1,0 +1,21 @@
+- key: 30
+  name: filament_diameter
+  type: number
+  unit: mm
+  example: 2.85
+  category: fff
+  description:
+    - Diameter of the filament, in mm.
+  deprecated: true
+  deprecation_message: Replaced by filament_diameter_v2 which uses µm instead of mm
+  
+- key: 33
+  name: min_nozzle_diameter
+  type: number
+  example: 0.4
+  unit: mm  
+  category: fff
+  description:
+    - This field specifies minimum nozzle diameter recommended for printing this material.
+  deprecated: true
+  deprecation_message: Replaced by min_nozzle_diameter_v2 which uses µm instead of mm

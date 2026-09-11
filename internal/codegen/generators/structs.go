@@ -86,7 +86,11 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 
 	// Add each field to the struct
 	for _, field := range fields {
-		if field.IsDeprecated() {
+
+		// Some fields exist that are deprecated (in the original repo) but have no other info
+		// we can't use those, although we can use our own deprecated field
+		if field.IsDeprecated() && field.Type() == "" {
+			// Skip deprecated fields with no other info
 			continue
 		}
 
@@ -116,6 +120,10 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 			optAnnotations = append(optAnnotations, fmt.Sprintf("%s=%s", st.OptTagContainerType, st.OptTagContainerTypeDefinite))
 		}
 
+		if field.IsDeprecated() {
+			optAnnotations = append(optAnnotations, st.OptTagDeprecated)
+		}
+
 		theType, imports := field.GetInternalTypeAndImports()
 		for _, item := range imports {
 			importMap[item] = true
@@ -140,6 +148,13 @@ func generateStruct(filename string, prefix, name string, fields []config.Field,
 		setterComment := strings.ReplaceAll(strings.ReplaceAll(commentTemplate, "#type#", "Set"), "#op#", "Sets")
 		getterComment := strings.ReplaceAll(strings.ReplaceAll(commentTemplate, "#type#", "Get"), "#op#", "Gets")
 		clearComment := strings.ReplaceAll(strings.ReplaceAll(commentTemplate, "#type#", "Clear"), "#op#", "Clears")
+
+		if field.IsDeprecated() {
+			depNotice := "\n// \n// Deprecated: " + field.DeprecationMessage()
+			setterComment += depNotice
+			getterComment += depNotice
+			clearComment += depNotice
+		}
 
 		// Generate a templater with common properties
 		templater := NewTemplater().
